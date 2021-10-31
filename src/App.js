@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState,useRef} from 'react';
 import './App.css';
 
 import firebase from 'firebase/compat/app';
@@ -26,7 +26,8 @@ function App() {
   return (
     <div className="App">
       <header>
-        
+        <h1>{user && user.displayName}⚛️🔥💬</h1>
+        <SignOut />
       </header>
       <section>
         {user ? <ChatRoom /> : <SignIn />}
@@ -53,6 +54,9 @@ function SignOut(){
 }
 
 function ChatRoom(){
+
+  const dummy = useRef()
+
   const messagesRef = firestore.collection('messages');
   const query = messagesRef.orderBy('createdAt').limit(25);
 
@@ -64,23 +68,27 @@ function ChatRoom(){
   const sendMessage = async(e) => {
     e.preventDefault();
 
-    const { uid, photoURL } = auth.currentUser;
+    if(formValue !== ''){
+      const { uid, photoURL } = auth.currentUser;
 
-    await messagesRef.add({
-      text: formValue,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uid,
-      photoURL
-    });
-
+      await messagesRef.add({
+        text: formValue,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        uid,
+        photoURL
+      });
+    }
     setFormValue('');
+
+    dummy.current.scrollIntoView({});
   }
 
   return(
     <>
-      <div>
+      <main>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/>)}
-      </div>
+        <div ref={dummy}></div>
+      </main>
 
       <form onSubmit={sendMessage}>
         <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
