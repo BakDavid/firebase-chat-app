@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
 
 import firebase from 'firebase/compat/app';
@@ -58,11 +58,34 @@ function ChatRoom(){
 
   // this field listens to any changes in database and updates messages
   const [messages] = useCollectionData(query,{idField: 'id'});
+
+  const [formValue, setFormValue] = useState('');
+
+  const sendMessage = async(e) => {
+    e.preventDefault();
+
+    const { uid, photoURL } = auth.currentUser;
+
+    await messagesRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL
+    });
+
+    setFormValue('');
+  }
+
   return(
     <>
       <div>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/>)}
       </div>
+
+      <form onSubmit={sendMessage}>
+        <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
+        <button type="submit">Send</button>
+      </form>
     </>
   )
 }
