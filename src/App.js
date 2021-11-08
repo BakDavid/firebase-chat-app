@@ -58,7 +58,7 @@ function ChatRoom(){
   const dummy = useRef()
 
   const messagesRef = firestore.collection('messages');
-  const query = messagesRef.orderBy('createdAt').limit(25);
+  const query = messagesRef.orderBy('createdAt',"desc").limit(25);
 
   // this field listens to any changes in database and updates messages
   const [messages] = useCollectionData(query,{idField: 'id'});
@@ -86,7 +86,7 @@ function ChatRoom(){
   return(
     <>
       <main>
-        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/>)}
+        {messages && messages.reverse().map(msg => <ChatMessage key={msg.id} message={msg}/>)}
         <div ref={dummy}></div>
       </main>
 
